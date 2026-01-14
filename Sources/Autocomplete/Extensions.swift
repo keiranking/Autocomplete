@@ -15,4 +15,8 @@ extension String {
     var lastWord: String? {
         split(separator: " ").last.map(String.init)
     }
+
+    var hasTrailingWhitespace: Bool {
+        self.last?.isWhitespace ?? false
+    }
 }

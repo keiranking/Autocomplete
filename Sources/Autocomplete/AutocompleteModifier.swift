@@ -69,6 +69,7 @@ struct AutocompleteModifier: ViewModifier {
 
     func suggestion(for input: String) -> String? {
         guard
+            !input.hasTrailingWhitespace,
             let lastWord = input.lastWord,
             lastWord.count > 1,
             let suggestion = autocompleter.complete(lastWord),
