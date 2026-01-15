@@ -5,10 +5,12 @@ struct AutocompleteModifier: ViewModifier {
     @Binding var text: String
     let autocompleter: Autocompleter
 
-    let characterLimit: Int = 45
-    var remainingCharacters: Int { characterLimit - text.count }
-    @State private var rejectInputAnimationTrigger: Int = 0
+    let characterLimit: Int
+    let minimumCompletableTokenLength: Int
 
+    var remainingCharacters: Int { characterLimit - text.count }
+
+    @State private var rejectInputAnimationTrigger: Int = 0
     @State private var suggestion: String? = nil
     @State private var isForwardTyping: Bool = false
 
@@ -70,7 +72,7 @@ struct AutocompleteModifier: ViewModifier {
     func suggestion(for input: String) -> String? {
         guard
             let lastWord = input.lastWord,
-            lastWord.count > 1,
+            lastWord.count >= minimumCompletableTokenLength,
             let suggestion = autocompleter.complete(lastWord),
             suggestion.count <= remainingCharacters
         else { return nil }
@@ -89,13 +91,18 @@ public extension View {
     func autocomplete(
         text: Binding<String>,
         using candidates: [String],
+
+        characterLimit: Int? = nil,
+        minimumCompletableTokenLength: Int = 2,
         disabled: Bool = false
     ) -> some View {
         if disabled { self }
         else { self.modifier(
             AutocompleteModifier(
                 text: text,
-                autocompleter: Autocompleter(candidates: candidates)
+                autocompleter: Autocompleter(candidates: candidates),
+                characterLimit: characterLimit ?? 999999,
+                minimumCompletableTokenLength: minimumCompletableTokenLength
             )
         ) }
     }
@@ -108,6 +115,8 @@ public extension View {
         .autocomplete(
             text: $text,
             using: Autocompleter.example.candidates,
+            characterLimit: 45,
+            minimumCompletableTokenLength: 2,
             disabled: false
         )
         .font(.system(size: 24))
