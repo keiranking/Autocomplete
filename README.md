@@ -6,6 +6,8 @@ It was built for [Attune], and should not be considered a robust general solutio
 
 [Attune]: https://github.com/keiranking/Attune
 
+<img width="630" alt="Autocomplete demo" src="demo.gif" >
+
 ## Requirements
 
 macOS 14+
